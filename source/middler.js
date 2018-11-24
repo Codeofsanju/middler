@@ -22,9 +22,22 @@ var Middler = function(){
 /*======== Follow the spec in middler.spec.js ========*/
 
 // user interface (API) for registering middleware
-App.prototype.use = function() {
-  // ▼ DEFINE THIS FUNCTION ▼
+App.prototype.use = function(...args) {
+  // default root mount case
+  // all args are middleware functions that are put on the default root dir
+  if(!(typeof(args[0]) === 'string')){
+    args.map(midFunc =>{ 
+        this._chain.push({mount: '/', middleware: midFunc});
+      });
+  }
 
+  // custom mounting on given route 
+  // args[0] always holds the route (passed as a string), the rest of args are the middleware functions
+  else{
+    for(let i = 1; i < args.length; i++){
+      this._chain.push({mount: args[0], middleware: args[i]});
+    }
+  }
 };
 
 // internal method triggered by a hypothetical HTTP request
